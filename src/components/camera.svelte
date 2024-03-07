@@ -28,9 +28,7 @@
     formats: ["qr_code", "unknown"],
   });
   setInterval(async () => {
-    console.log("detecting barcodes");
     const barcodes = await barcodeDetector.detect(videoElement);
-    console.log(barcodes);
     if (barcodes.length <= 0) return;
     $latestCode = (barcodes[0].rawValue);
     localStorage.setItem("latestCode", barcodes[0].rawValue);
