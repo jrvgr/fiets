@@ -1,3 +1,18 @@
-  @tailwind utilities;
-  @tailwind components;
-  @tailwind base;
+@tailwind utilities;
+@tailwind components;
+@tailwind base;
+
+@layer components {
+    .settings-input {
+        @apply border-2 px-2 py-1 rounded-lg border-gray-300;
+    }
+
+    /* <agnostic qr reader plugin> */
+    #qr-shaded-region {
+        @apply hidden;
+    }
+    #reader video {
+        @apply rounded-xl;
+    }
+    /* </agnostic qr reader plugin> */
+}
