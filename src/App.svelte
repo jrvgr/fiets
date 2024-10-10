@@ -1,44 +1,56 @@
 <script lang="ts">
-	import Camera from "./components/camera.svelte";
-	import { latestCode } from "./store";
-	import Bike from "./components/bike.svelte";
-	import Parking from "./components/parking.svelte";
+    import Camera from "./components/camera/index.svelte";
+    import Bike from "./components/icons/bike.svelte";
+    import Parking from "./components/icons/parking.svelte";
+    import CogwheelIcon from "./components/icons/cogwheel.svelte";
+    import HistoryIcon from "./components/icons/history.svelte";
+    import { history } from "@/lib/history";
+    import type { Item } from "./lib/spot-deconstructor";
 
-	let showChanged = false;
-	// 	let oldCode = localStorage.getItem("latestCode") ?? ""
-	//
-	// 	latestCode.subscribe((value) => {
-	// 		if (value === oldCode) return;
-	// 		showChanged = true
-	// 		setTimeout(() => {
-	// 			showChanged = false
-	// 		}, 5500)
-	// 	})
+    let showSettingsDialog = false;
+    let showHistoryDialog = false;
+    import Settings from "@/components/settings/index.svelte";
+    import History from "@/components/history/index.svelte";
 
-	if (!$latestCode) {
-		$latestCode = localStorage.getItem("latestCode") ?? "http://ab9.nl/TZB1002";
-	}
-	$: codeUrl = new URL($latestCode);
-	$: path = codeUrl.pathname.split("/").pop();
-	// row is the last letter and the first digit of path
-	$: row = path?.match(/[a-zA-Z]\d/)?.[0];
-	// spot is everything after the first digit
-	$: spot = path?.match(/\d.*/)?.[0].slice(1);
+    const onScanned = (event: CustomEvent<{ code: Item }>) => {
+        latestCode = event.detail.code;
+    };
+
+    let latestCode = history.get()[0] ?? ({} as Item);
 </script>
 
 <main
-	class="p-6 flex flex-col items-center gap-4 bg-zinc-50 h-[100dvh] w-[100dvw]"
+    class="p-6 flex flex-col items-center gap-4 bg-zinc-50 h-[100dvh] w-[100dvw]"
 >
-	<div class="flex scale-[3] mb-5 mt-2"><Bike /> <Parking /></div>
-	<Camera />
-	<div class="flex gap-4 flex-grow items-center">
-		<p class="text-xl">row: {row}</p>
-		<p class="text-xl">spot: {spot}</p>
-	</div>
-	{#if showChanged}
-		<p class="text-xl animate-ping">Spot has changed</p>
-	{/if}
+    <div class="flex justify-between items-baseline w-full">
+        <button
+            aria-label="Settings"
+            class="bg-zinc-100 w-12 h-12 p-3 rounded-md"
+            on:click={() => (showSettingsDialog = !showSettingsDialog)}
+            ><CogwheelIcon /></button
+        >
+        <div class="flex mb-5 mt-2 w-18 h-14">
+            <Bike />
+            <Parking />
+        </div>
+        <button
+            aria-label="History"
+            class="bg-zinc-100 w-12 h-12 p-3 rounded-md"
+            on:click={() => (showHistoryDialog = !showHistoryDialog)}
+        >
+            <HistoryIcon /></button
+        >
+    </div>
+    <Camera on:scanned={onScanned} />
+    {#key latestCode}
+        <div class="animate-scale text-xl flex h-full items-center">
+            <p>
+                row: {latestCode.row}
+                spot: {latestCode.spot}
+            </p>
+        </div>
+    {/key}
 </main>
 
-<style>
-</style>
+<Settings bind:showModal={showSettingsDialog} />
+<History bind:showModal={showHistoryDialog} />
