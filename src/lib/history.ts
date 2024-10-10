@@ -33,7 +33,10 @@ class HistoryManager {
     }));
 
     // legacy migrator
-    if (localStorage.getItem("latestCode") !== "") {
+    if (
+      localStorage.getItem("latestCode") !== "" &&
+      localStorage.getItem("latestCode") !== null
+    ) {
       const latestCode = localStorage.getItem("latestCode");
       const item = spotDeconstructor(latestCode as string, true);
       this.add(item);
