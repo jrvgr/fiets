@@ -37,7 +37,7 @@ class HistoryManager {
       const latestCode = localStorage.getItem("latestCode");
       const item = spotDeconstructor(latestCode as string, true);
       this.add(item);
-      localStorage.setItem("latestCode", "");
+      localStorage.removeItem("latestCode");
     }
   }
 
