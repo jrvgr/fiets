@@ -28,9 +28,17 @@ class HistoryManager {
     this.storage = JSON.parse(
       localStorage.getItem(this.localStorageKey) ?? "[]",
     ).map((item: Item) => ({
-      date: new Date(item.date),
       ...item,
+      date: new Date(item.date),
     }));
+
+    // legacy migrator
+    if (localStorage.getItem("latestCode") !== "") {
+      const latestCode = localStorage.getItem("latestCode");
+      const item = spotDeconstructor(latestCode as string, true);
+      this.add(item);
+      localStorage.setItem("latestCode", "");
+    }
   }
 
   public flush() {
