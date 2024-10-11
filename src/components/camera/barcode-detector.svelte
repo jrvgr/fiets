@@ -5,9 +5,10 @@
   import { spotDeconstructor, type Item } from "@/lib/spot-deconstructor";
   import { createEventDispatcher } from "svelte";
 
-  const dispatch = createEventDispatcher<{ code: Item }>();
+  const dispatch = createEventDispatcher<{ scanned: Item }>();
   const cameraStream = getCameraStream();
   let videoElement: HTMLVideoElement;
+  export let save = true;
 
   async function getCameraStream() {
     return await navigator.mediaDevices.getUserMedia({
@@ -38,12 +39,10 @@
   setInterval(async () => {
     try {
       const barcodes = await barcodeDetector.detect(videoElement);
-      if (barcodes.length <= 0) return;
+      if (barcodes.length <= 0 || !save) return;
       const qrcode = spotDeconstructor(barcodes[0].rawValue);
       history.add(qrcode);
-      dispatch("scanned", {
-        code: qrcode,
-      });
+      dispatch("scanned", qrcode);
     } catch {}
   }, 1000);
 </script>

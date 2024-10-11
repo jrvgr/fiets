@@ -12,8 +12,8 @@
   import Settings from "@/components/settings/index.svelte";
   import History from "@/components/history/index.svelte";
 
-  const onScanned = (event: CustomEvent<{ code: Item }>) => {
-    latestCode = event.detail.code;
+  const onScanned = (event: CustomEvent<Item>) => {
+    latestCode = event.detail;
   };
 
   let latestCode = history.get()[0] ?? ({} as Item);

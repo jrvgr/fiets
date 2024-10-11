@@ -20,7 +20,7 @@
     on:close={() => (showModal = false)}
     on:click|self={() => dialogElement.close()}
     on:close
-    class="p-3 open:flex flex-col gap-2 rounded-xl"
+    class="p-3 animate-zoom open:flex flex-col gap-2 rounded-xl"
   >
     <h1 class="text-2xl my-1 font-bold">Settings</h1>
     <button

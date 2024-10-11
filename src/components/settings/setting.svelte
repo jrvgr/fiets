@@ -19,7 +19,7 @@
 {#if type === "boolean"}
   <label class="flex gap-3 m-3">
     <input type="checkbox" bind:checked={value} on:change={update} />
-    <span aria-hidden class="w-px bg-gray-200"> </span>
+    <span aria-hidden class="w-px bg-gray-200" />
     {description}
   </label>
 {:else if type === "number"}

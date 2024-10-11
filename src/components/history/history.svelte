@@ -1,3 +1,5 @@
+<svelte:options immutable />
+
 <script lang="ts">
   import dayjs from "dayjs";
   import calendar from "dayjs/plugin/calendar";

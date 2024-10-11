@@ -3,8 +3,9 @@
   import { Html5Qrcode } from "html5-qrcode";
   import { spotDeconstructor, type Item } from "@/lib/spot-deconstructor";
   import { history } from "@/lib/history";
+  export let save = false;
 
-  const dispatch = createEventDispatcher<{ code: Item }>();
+  const dispatch = createEventDispatcher<{ scanned: Item }>();
   let scanning = false;
 
   function onScanFailure(error: string) {
@@ -13,10 +14,9 @@
 
   function onScanSuccess(qrCode: string) {
     const qrcode = spotDeconstructor(qrCode);
+    if (!save) return;
     history.add(qrcode);
-    dispatch("scanned", {
-      code: qrcode,
-    });
+    dispatch("scanned", qrcode);
   }
 
   let html5Qrcode: Html5Qrcode;

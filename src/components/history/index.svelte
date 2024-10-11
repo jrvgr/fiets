@@ -15,7 +15,7 @@
   bind:this={dialogElement}
   on:close={() => (showModal = false)}
   on:click|self={() => dialogElement.close()}
-  class="p-3 open:flex w-full mx-5 flex-col gap-2 rounded-xl"
+  class="p-3 animate-zoom open:flex w-full mx-5 flex-col gap-2 rounded-xl"
 >
   <h1 class="text-2xl my-1 font-bold">History</h1>
   <button
@@ -35,5 +35,7 @@
         location={historyItem.location}
       />
     </div>
+  {:else}
+    <p>You haven't scanned any QR-codes yet!</p>
   {/each}
 </dialog>
