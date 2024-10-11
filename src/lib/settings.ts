@@ -96,7 +96,9 @@ function GetInitialSettings() {
         ) as CustomValue;
         return {
           ...defaultValue,
-          value: parsedSettings[element].customValues[i].value,
+          value: parsedSettings[element].customValues
+            ? parsedSettings[element].customValues[i].value
+            : defaultValue.value,
         };
       }),
     }));
