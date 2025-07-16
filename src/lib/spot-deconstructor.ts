@@ -8,9 +8,10 @@ export type Item = {
 // [location (2ch)][row (2ch)][spot (rest of numbers)]
 
 export function spotDeconstructor(originalString: string, url = true): Item {
-  const spot = url
-    ? (originalString.split("/").pop() as string)
-    : originalString;
+  const spot =
+    url && originalString
+      ? (originalString.split("/").pop() as string)
+      : originalString;
 
   console.log(spot);
   const location = spot.slice(0, 2);
