@@ -34,7 +34,7 @@ class HistoryManager {
 
     // legacy migrator
     if (
-      localStorage.getItem("latestCode") !== "" &&
+      localStorage.getItem("latestCode") !== "" ||
       localStorage.getItem("latestCode") !== null
     ) {
       const latestCode = localStorage.getItem("latestCode");

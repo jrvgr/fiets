@@ -34,7 +34,7 @@ const defaultSettings: Record<string, Setting> = {
     id: 3,
     name: "Toggle Webhook",
     value: false,
-    description: "Toggle the webhook on or off",
+    description: "Enable the webhook",
     customValues: [],
   },
   webhook: {
@@ -66,47 +66,43 @@ const defaultSettings: Record<string, Setting> = {
 };
 
 function GetInitialSettings() {
-  const storedSettings = localStorage.getItem("settings");
-  const clone = {} as { [key: string]: Writable<Setting> };
+  const storedSettings = JSON.parse(
+    localStorage.getItem("settings") ?? "{}",
+  ) as Record<string, Setting>;
 
-  Object.keys(defaultSettings).forEach((element) => {
-    Object.assign(clone, {
-      [element]: writable(structuredClone(defaultSettings[element])),
-    });
-  });
-
-  console.log("clone", clone);
+  const mappedDefaults = Object.fromEntries(
+    Object.entries(defaultSettings).map(([key, value]) => [
+      key,
+      writable(value),
+    ]),
+  );
 
   // if there are no stored settings, return the default settings
-  if (!storedSettings || storedSettings === "") {
-    return clone;
+  if (Object.keys(storedSettings).length < 1) {
+    return mappedDefaults;
   }
 
-  const parsedSettings = JSON.parse(storedSettings!);
   // first we write the default settings, to the clone, after that we overwrite the default settings with the stored settings
 
-  Object.keys(parsedSettings).forEach((element) => {
-    clone[element].update((cur) => ({
-      ...cur,
-      value: parsedSettings[element].value,
-      // we need to only assign the saved value, the rest of the custom value should be the default
-      customValues: cur.customValues.map((customValue, i) => {
-        const defaultValue = defaultSettings[element].customValues.find(
-          (value) => value.name === customValue.name,
-        ) as CustomValue;
-        return {
-          ...defaultValue,
-          value: parsedSettings[element].customValues
-            ? parsedSettings[element].customValues[i].value
-            : defaultValue.value,
-        };
-      }),
-    }));
+  return Object.entries(defaultSettings).map(([key, item]) => {
+    if (storedSettings.hasOwnProperty(key)) {
+      return [
+        key,
+        writable({
+          ...item,
+          value: storedSettings[key].value,
+          customValues: item.customValues.map((cValue, i) => {
+            const storedCustomValue = storedSettings[key].customValues[i];
+
+            if (storedCustomValue.name === cValue.name) {
+              return { ...cValue, value: storedCustomValue.value };
+            }
+          }),
+        }),
+      ];
+    }
+    return [key, writable(item)];
   });
-
-  console.log(clone);
-
-  return clone;
 }
 
 class SettingsManager {
