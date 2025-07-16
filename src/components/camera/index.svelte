@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { settings, type Setting } from "@/lib/settings";
+  import { settings } from "@/lib/settings";
+  import type { Setting } from "@/lib/settings";
   import Agnostic from "./agnostic.svelte";
   import BarcodeDetector from "./barcode-detector.svelte";
   import type { Writable } from "svelte/store";
@@ -30,7 +31,7 @@
   {#if cameraIsPresent}
     {#key $barcodeDetector}
       <div class="w-full h-full relative">
-        {#if $barcodeDetector.value}
+        {#if $barcodeDetector && $barcodeDetector.value}
           <BarcodeDetector on:scanned={onScan} save={saving} />
         {:else}
           <Agnostic on:scanned={onScan} save={saving} />

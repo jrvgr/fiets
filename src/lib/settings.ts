@@ -66,9 +66,15 @@ const defaultSettings: Record<string, Setting> = {
 };
 
 function GetInitialSettings() {
-  const storedSettings = JSON.parse(
-    localStorage.getItem("settings") ?? "{}",
-  ) as Record<string, Setting>;
+  let storedSettings: Record<string, Setting> = {};
+
+  try {
+    storedSettings = JSON.parse(
+      localStorage.getItem("settings") ?? "{}",
+    ) as Record<string, Setting>;
+  } catch (error) {
+    console.error("Failed to parse settings from localStorage:", error);
+  }
 
   const mappedDefaults = Object.fromEntries(
     Object.entries(defaultSettings).map(([key, value]) => [
@@ -84,25 +90,28 @@ function GetInitialSettings() {
 
   // first we write the default settings, to the clone, after that we overwrite the default settings with the stored settings
 
-  return Object.entries(defaultSettings).map(([key, item]) => {
-    if (storedSettings.hasOwnProperty(key)) {
-      return [
-        key,
-        writable({
-          ...item,
-          value: storedSettings[key].value,
-          customValues: item.customValues.map((cValue, i) => {
-            const storedCustomValue = storedSettings[key].customValues[i];
+  return Object.fromEntries(
+    Object.entries(defaultSettings).map(([key, item]) => {
+      if (storedSettings.hasOwnProperty(key)) {
+        return [
+          key,
+          writable({
+            ...item,
+            value: storedSettings[key].value,
+            customValues: item.customValues.map((cValue, i) => {
+              const storedCustomValue = storedSettings[key].customValues?.[i];
 
-            if (storedCustomValue.name === cValue.name) {
-              return { ...cValue, value: storedCustomValue.value };
-            }
+              if (storedCustomValue && storedCustomValue.name === cValue.name) {
+                return { ...cValue, value: storedCustomValue.value };
+              }
+              return cValue;
+            }),
           }),
-        }),
-      ];
-    }
-    return [key, writable(item)];
-  });
+        ];
+      }
+      return [key, writable(item)];
+    }),
+  );
 }
 
 class SettingsManager {

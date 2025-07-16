@@ -11,7 +11,7 @@ const reformatBody = (body: string, item: Item) => {
 
   let dated = body;
   if (item.date) {
-    body.replace("<date>", item.date.toString());
+    dated = dated.replace("<date>", item.date.toString());
   }
   const located = dated.replace("<location>", item.location);
   const rowed = located.replace("<row>", item.row);
@@ -25,12 +25,17 @@ class HistoryManager {
   private localStorageKey = "history";
 
   constructor() {
-    this.storage = JSON.parse(
-      localStorage.getItem(this.localStorageKey) ?? "[]",
-    ).map((item: Item) => ({
-      ...item,
-      date: new Date(item.date),
-    }));
+    try {
+      this.storage = JSON.parse(
+        localStorage.getItem(this.localStorageKey) ?? "[]",
+      ).map((item: Item) => ({
+        ...item,
+        date: new Date(item.date),
+      }));
+    } catch (error) {
+      console.error("Failed to parse history from localStorage:", error);
+      this.storage = [];
+    }
 
     // legacy migrator
     if (
@@ -65,9 +70,17 @@ class HistoryManager {
     const reformattedBody = reformatBody(bodyValue.value as string, item);
 
     if (webhookSetting.value !== "" && webhookToggled.value) {
+      let headers = null;
+      try {
+        headers = JSON.parse(headersValue.value as string);
+      } catch (error) {
+        console.error("Failed to parse webhook headers JSON:", error);
+        headers = {};
+      }
+
       fetch(webhookSetting.value as string, {
         method: "POST",
-        headers: JSON.parse(headersValue.value as string) ?? null,
+        headers: headers,
         body: reformattedBody,
       });
     }
